@@ -1,13 +1,22 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Services from "@/src/components/appointment/services";
+// 1. Define what a brand object looks like
+interface CarBrandEntry {
+  brand: string;
+  models: string[];
+}
 
+// 2. Define the overall structure (Keys are years, values are arrays of brands)
+interface CarData {
+  [year: string]: CarBrandEntry[];
+}
 export default function Appointment() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     carBrand: "",
     carModel: "",
-    carYear: "",
+    carYear: 0,
     name: "",
     phone: "",
     email: "",
@@ -18,12 +27,13 @@ export default function Appointment() {
     notes: "",
   });
 
-  const carBrands = {
-    Toyota: ["Corolla", "Camry", "RAV4", "Highlander"],
-    Honda: ["Civic", "Accord", "CR-V", "Pilot"],
-    Ford: ["Focus", "F-150", "Escape", "Explorer"],
-    BMW: ["3 Series", "5 Series", "X3", "X5"],
-  };
+  const [carBrands, setCarBrands] = useState<CarData>({});
+
+  useEffect(() => {
+    fetch("/api/carData")
+      .then(res => res.json())
+      .then(data => setCarBrands(data));
+  }, []);
 
   const handleServiceToggle = (serviceName: string) => {
     setSelectedServices(prev =>
@@ -48,13 +58,12 @@ export default function Appointment() {
       selectedServices,
     };
 
-    console.log("Submitted:", appointmentData);
     alert("Appointment submitted!");
   };
 
-  // Generate years dynamically (current year - 30)
+  // Generate years dynamically (current year - )
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 50 }, (_, i) => String(currentYear - i));
+  const years = Array.from({ length: (currentYear - 1985) + 1 }, (_, i) => String(currentYear - i));
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -62,7 +71,7 @@ export default function Appointment() {
 
       {/* Services Section */}
       <Services onServiceToggle={handleServiceToggle} selectedServices={selectedServices} />
-
+      
       {/* Appointment Form */}
       <form
         onSubmit={handleSubmit}
@@ -137,52 +146,12 @@ export default function Appointment() {
 
         {/* Car Info */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Brand */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Car Brand</label>
-            <select
-              name="carBrand"
-              value={formData.carBrand}
-              onChange={handleChange}
-              className="border border-gray-600 rounded-md w-full p-2 bg-white"
-              required
-            >
-              <option value="">Select Brand</option>
-              {Object.keys(carBrands).map(brand => (
-                <option key={brand} value={brand}>
-                  {brand}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Model */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Car Model</label>
-            <select
-              name="carModel"
-              value={formData.carModel}
-              onChange={handleChange}
-              className="w-full border border-gray-600 rounded-md p-2"
-              required
-              disabled={!formData.carBrand}
-            >
-              <option value="">Select Model</option>
-              {formData.carBrand &&
-                carBrands[formData.carBrand as keyof typeof carBrands].map(model => (
-                  <option key={model} value={model}>
-                    {model}
-                  </option>
-                ))}
-            </select>
-          </div>
-
           {/* Year */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Car Year</label>
             <select
               name="carYear"
-              value={formData.carYear}
+              value={String(formData.carYear)}
               onChange={handleChange}
               className="w-full border border-gray-600 rounded-md p-2"
               required
@@ -193,6 +162,54 @@ export default function Appointment() {
                   {y}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Brand */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Car Brand</label>
+            <select
+              name="carBrand"
+              value={formData.carBrand}
+              onChange={handleChange}
+              className="border border-gray-600 rounded-md w-full p-2 bg-white disabled:bg-gray-200"
+              required
+              disabled={!formData.carYear} // Enable only if year is selected
+            >
+              <option value="">Select Brand</option>
+              {formData.carYear && carBrands?.[formData.carYear] ? (
+                carBrands[String(formData.carYear)].map((entry, index) => (
+                  <option key={index} value={entry.brand}>
+                    {entry.brand}
+                  </option>
+                ))
+              ) : (
+                <option disabled>Loading brands...</option>
+              )}
+            </select>
+          </div>
+
+          {/* Model */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Car Model</label>
+            <select
+              name="carModel"
+              value={formData.carModel}
+              onChange={handleChange}
+              className="w-full border border-gray-600 rounded-md p-2  disabled:bg-gray-200"
+              required
+              disabled={formData.carBrand === ""}
+            >
+              <option value="">Select Model</option>
+              {formData.carYear && formData.carBrand && carBrands[formData.carYear] &&
+                carBrands[formData.carYear]
+                  .find(b => b.brand === formData.carBrand) // Find the brand object
+                  ?.models.map(model => (                  // Map its models array
+                    <option key={model} value={model}>
+                      {model}
+                    </option>
+                  ))
+              }
             </select>
           </div>
         </div>
