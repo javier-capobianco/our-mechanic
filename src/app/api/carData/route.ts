@@ -1,12 +1,9 @@
-import { NextResponse } from "next/server";
-
-// In a Next.js Server Component or API Route
-import { promises as fs } from 'fs';
-import path from 'path';
+import fs from "fs/promises";
+import path from "path";
 
 async function loadDataToJson() {
   // 1. Point to the file in your root 'data' folder
-  const filePath = path.join( 'data', 'cars.json');
+  const filePath = path.join(process.cwd(), "data", "cars.json");
   
   // 2. Read the file
   const fileContents = await fs.readFile(filePath, 'utf8');
