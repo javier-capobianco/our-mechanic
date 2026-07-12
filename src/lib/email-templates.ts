@@ -1,5 +1,5 @@
 const BRAND_RED = "#ED2424";
-const LOGO_URL = "https://d11hq8wdns9i0v.amplifyapp.com/OurMechanicLogo-1.png";
+const LOGO_URL = "https://ourmechanic.ca/OurMechanicLogo-1.png";
 
 function emailWrapper(content: string): string {
   return `
@@ -16,7 +16,7 @@ function emailWrapper(content: string): string {
             <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
               <!-- Header -->
               <tr>
-                <td style="background-color: #1a1a1a; padding: 24px; text-align: center;">
+                <td style="background-color: #ffffff; padding: 24px; text-align: center;">
                   <img src="${LOGO_URL}" alt="Our Mechanic" width="180" style="display: block; margin: 0 auto;" />
                 </td>
               </tr>
