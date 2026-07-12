@@ -1,5 +1,6 @@
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { NextResponse } from "next/server";
+import { ownerContactEmail, userContactConfirmation } from "@/src/lib/email-templates";
 
 const ses = new SESClient({
   region: process.env.SES_REGION || process.env.AWS_SES_REGION || "us-west-2",
@@ -38,14 +39,7 @@ export async function POST(request: Request) {
             Data: `You have a new message from the Our Mechanic website:\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
           },
           Html: {
-            Data: `
-              <h2>New Contact Form Submission</h2>
-              <p><strong>Name:</strong> ${name}</p>
-              <p><strong>Email:</strong> ${email}</p>
-              <hr />
-              <p><strong>Message:</strong></p>
-              <p>${message.replace(/\n/g, "<br />")}</p>
-            `,
+            Data: ownerContactEmail(name, email, message),
           },
         },
       },
@@ -67,16 +61,7 @@ export async function POST(request: Request) {
             Data: `Hi ${name},\n\nThank you for reaching out to Our Mechanic! We've received your message and will get back to you within 24 hours during business days.\n\nYour message:\n"${message}"\n\nIf you need immediate assistance, please call us at 403-277-7174.\n\nBest regards,\nOur Mechanic Team\n3927 3-A St NE, Calgary, AB\nMon–Fri: 8:00 AM – 5:00 PM`,
           },
           Html: {
-            Data: `
-              <h2>Thank you for contacting Our Mechanic!</h2>
-              <p>Hi ${name},</p>
-              <p>We've received your message and will get back to you within 24 hours during business days.</p>
-              <p><strong>Your message:</strong></p>
-              <blockquote style="border-left: 3px solid #ED2424; padding-left: 12px; color: #555;">${message.replace(/\n/g, "<br />")}</blockquote>
-              <p>If you need immediate assistance, please call us at <strong>403-277-7174</strong>.</p>
-              <br />
-              <p>Best regards,<br /><strong>Our Mechanic Team</strong><br />3927 3-A St NE, Calgary, AB<br />Mon–Fri: 8:00 AM – 5:00 PM</p>
-            `,
+            Data: userContactConfirmation(name, message),
           },
         },
       },
