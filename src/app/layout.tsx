@@ -15,8 +15,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Our Mechanic",
-  description: "Auto Mechanic Shop",
+  title: {
+    default: "Our Mechanic | Auto Repair Shop in Calgary, AB",
+    template: "%s | Our Mechanic",
+  },
+  description:
+    "Family-owned automotive repair facility in Calgary, AB. Serving all makes and models since 2004. Engine repairs, diagnostics, inspections and more. Call 403-277-7174.",
+  openGraph: {
+    title: "Our Mechanic | Auto Repair Shop in Calgary, AB",
+    description:
+      "Family-owned automotive repair facility in Calgary, AB. Serving all makes and models since 2004.",
+    url: "https://ourmechanic.ca",
+    siteName: "Our Mechanic",
+    locale: "en_CA",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
