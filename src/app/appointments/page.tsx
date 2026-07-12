@@ -13,6 +13,8 @@ interface CarData {
 }
 export default function Appointment() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     carBrand: "",
     carModel: "",
@@ -50,15 +52,48 @@ export default function Appointment() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setStatus("loading");
+    setErrorMessage("");
 
     const appointmentData = {
       ...formData,
       selectedServices,
+      isTest: true, // Set to false for production
     };
 
-    alert("Appointment submitted!");
+    try {
+      const res = await fetch("/api/appointment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(appointmentData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Something went wrong.");
+      }
+
+      setStatus("success");
+      setFormData({
+        carBrand: "",
+        carModel: "",
+        carYear: 0,
+        name: "",
+        phone: "",
+        email: "",
+        date: "",
+        timeHour: "9",
+        timeMinute: "00",
+        timePeriod: "AM",
+        notes: "",
+      });
+      setSelectedServices([]);
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "Failed to submit appointment.");
+    }
   };
 
   // Generate years dynamically (current year - )
@@ -272,10 +307,22 @@ export default function Appointment() {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-our-mechanic-red text-white py-2 rounded-md font-semibold hover:bg-red-600 transition cursor-pointer"
+          disabled={status === "loading"}
+          className="w-full bg-our-mechanic-red text-white py-2 rounded-md font-semibold hover:bg-red-600 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit Appointment
+          {status === "loading" ? "Submitting..." : "Submit Appointment"}
         </button>
+
+        {status === "success" && (
+          <p className="text-green-600 text-sm mt-2">
+            ✅ Your appointment request has been submitted! We&apos;ll contact you within 24 hours to confirm.
+          </p>
+        )}
+        {status === "error" && (
+          <p className="text-red-600 text-sm mt-2">
+            ❌ {errorMessage}
+          </p>
+        )}
       </form>
     </div>
   );
