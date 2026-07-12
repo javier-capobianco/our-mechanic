@@ -16,13 +16,7 @@ export default function Experience() {
                         <span className="text-red-600">10 YEARS</span> OF EXPERIENCE
                     </h2>
                     <p className="mb-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-                        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-                        mollit anim id est laborum.
+                        We service all makes and models and offer comprehensive automotive services including engine repairs, computer diagnostics, insurance inspections and more! From routine maintenance to complex needs, our staff is here to do what it takes to maintain your car. We are also certified to maintain new car warranties so you can rely on us to be your one-stop service shop.
                     </p>
                 </div>
             </div>
