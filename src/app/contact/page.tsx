@@ -7,17 +7,37 @@ export default function ContactPage() {
     email: "",
     message: "",
   });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", message: "" });
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Something went wrong.");
+      }
+
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "Failed to send message.");
+    }
   };
 
   return (
@@ -81,10 +101,22 @@ export default function ContactPage() {
 
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 rounded-md font-medium hover:bg-red-700 transition"
+            disabled={status === "loading"}
+            className="w-full bg-red-600 text-white py-2 rounded-md font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Send Message
+            {status === "loading" ? "Sending..." : "Send Message"}
           </button>
+
+          {status === "success" && (
+            <p className="text-green-600 text-sm mt-2">
+              ✅ Thank you for your message! We&apos;ll get back to you soon.
+            </p>
+          )}
+          {status === "error" && (
+            <p className="text-red-600 text-sm mt-2">
+              ❌ {errorMessage}
+            </p>
+          )}
         </form>
 
         {/* Contact Info */}
