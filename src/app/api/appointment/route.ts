@@ -53,7 +53,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const time = `${timeHour}:${timeMinute} ${timePeriod}`;
+    const hourNum = Number(timeHour);
+    const formattedHour = hourNum > 12 ? hourNum - 12 : hourNum;
+    const period = hourNum >= 12 ? "PM" : "AM";
+    const time = `${formattedHour}:${timeMinute || "00"} ${period}`;
     const id = randomUUID();
     const createdAt = new Date().toISOString();
 

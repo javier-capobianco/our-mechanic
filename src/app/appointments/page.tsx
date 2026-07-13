@@ -52,6 +52,39 @@ export default function Appointment() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const [dateError, setDateError] = useState("");
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value) {
+      const selectedDate = new Date(value + "T00:00:00");
+      const day = selectedDate.getDay();
+      if (day === 0 || day === 6) {
+        setDateError("We are closed on weekends. Please select a weekday.");
+        setFormData(prev => ({ ...prev, date: "" }));
+        return;
+      }
+    }
+    setDateError("");
+    setFormData(prev => ({ ...prev, date: value }));
+  };
+
+  // Get minimum selectable date (tomorrow to enforce advance booking)
+  const getMinDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
+  };
+
+  // Available hours: 8AM to 4PM (last appointment slot)
+  const availableHours = Array.from({ length: 9 }, (_, i) => i + 8); // 8, 9, 10, ..., 16
+
+  const formatHour = (hour: number) => {
+    if (hour === 12) return "12:00 PM";
+    if (hour > 12) return `${hour - 12}:00 PM`;
+    return `${hour}:00 AM`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
@@ -84,7 +117,7 @@ export default function Appointment() {
         phone: "",
         email: "",
         date: "",
-        timeHour: "9",
+        timeHour: "",
         timeMinute: "00",
         timePeriod: "AM",
         notes: "",
@@ -126,55 +159,41 @@ export default function Appointment() {
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Date */}
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="border border-gray-600 rounded-md p-2 w-full"
-              required
-            />
+            <div>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleDateChange}
+                min={getMinDate()}
+                className="border border-gray-600 rounded-md p-2 w-full"
+                required
+              />
+              {dateError && (
+                <p className="text-red-600 text-xs mt-1">{dateError}</p>
+              )}
+            </div>
 
             {/* Time selection */}
-            <div className="flex items-center gap-2">
+            <div>
               <select
                 name="timeHour"
                 value={formData.timeHour}
                 onChange={handleChange}
-                className="border border-gray-600 rounded-md p-2 w-20"
+                className="border border-gray-600 rounded-md p-2 w-full"
+                required
               >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
-                  <option key={hour}>{hour}</option>
+                <option value="">Select Time</option>
+                {availableHours.map(hour => (
+                  <option key={hour} value={String(hour)}>
+                    {formatHour(hour)}
+                  </option>
                 ))}
-              </select>
-
-              <span>:</span>
-
-              <select
-                name="timeMinute"
-                value={formData.timeMinute}
-                onChange={handleChange}
-                className="border border-gray-600 rounded-md p-2 w-20"
-              >
-                {["00", "15", "30", "45"].map(min => (
-                  <option key={min}>{min}</option>
-                ))}
-              </select>
-
-              <select
-                name="timePeriod"
-                value={formData.timePeriod}
-                onChange={handleChange}
-                className="border border-gray-600 rounded-md p-2 w-20"
-              >
-                <option>AM</option>
-                <option>PM</option>
               </select>
             </div>
 
-            <div className="text-gray-600 text-sm">
-              <p>Available time</p>
-              <p className="italic">Please call for an earlier appointment</p>
+            <div className="text-gray-600 text-sm flex items-center">
+              <p>Mon–Fri, 8:00 AM – 5:00 PM</p>
             </div>
           </div>
         </div>
