@@ -53,10 +53,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const hourNum = Number(timeHour);
-    const formattedHour = hourNum > 12 ? hourNum - 12 : hourNum;
+    const hourNum = Number(timeHour.split(":")[0]);
+    const minuteVal = timeHour.split(":")[1] || timeMinute || "00";
+    const formattedHour = hourNum > 12 ? hourNum - 12 : hourNum === 0 ? 12 : hourNum;
     const period = hourNum >= 12 ? "PM" : "AM";
-    const time = `${formattedHour}:${timeMinute || "00"} ${period}`;
+    const time = `${formattedHour}:${minuteVal} ${period}`;
     const id = randomUUID();
     const createdAt = new Date().toISOString();
 

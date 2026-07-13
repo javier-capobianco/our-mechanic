@@ -76,8 +76,21 @@ export default function Appointment() {
     return tomorrow.toISOString().split("T")[0];
   };
 
-  // Available hours: 8AM to 4PM (last appointment slot)
-  const availableHours = Array.from({ length: 9 }, (_, i) => i + 8); // 8, 9, 10, ..., 16
+  // Available hours: 8AM to 4:45PM in 15-min increments
+  const availableTimeSlots = (() => {
+    const slots: { value: string; label: string }[] = [];
+    for (let hour = 8; hour <= 16; hour++) {
+      const minutes = hour === 16 ? [0] : [0, 15, 30, 45];
+      for (const min of minutes) {
+        const displayHour = hour > 12 ? hour - 12 : hour;
+        const period = hour >= 12 ? "PM" : "AM";
+        const label = `${displayHour}:${String(min).padStart(2, "0")} ${period}`;
+        const value = `${hour}:${String(min).padStart(2, "0")}`;
+        slots.push({ value, label });
+      }
+    }
+    return slots;
+  })();
 
   const formatHour = (hour: number) => {
     if (hour === 12) return "12:00 PM";
@@ -184,9 +197,9 @@ export default function Appointment() {
                 required
               >
                 <option value="">Select Time</option>
-                {availableHours.map(hour => (
-                  <option key={hour} value={String(hour)}>
-                    {formatHour(hour)}
+                {availableTimeSlots.map(slot => (
+                  <option key={slot.value} value={slot.value}>
+                    {slot.label}
                   </option>
                 ))}
               </select>
