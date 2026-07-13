@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       })
     );
 
-    const ownerEmail = process.env.CONTACT_EMAIL || "javier.capobianco.2210@gmail.com";
+    const ownerEmail = process.env.CONTACT_EMAIL || "ourmechanic@gmail.com";
 
     // Email 1: Notification to shop owner
     const ownerNotification = new SendEmailCommand({
