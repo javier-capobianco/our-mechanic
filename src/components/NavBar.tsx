@@ -6,15 +6,15 @@ export default function NavBar() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
-        <nav className="flex px-4 border-b md:shadow-lg items-center relative">
+        <nav className="flex px-4 border-b md:shadow-lg items-center relative py-4">
             {/* Logo */}
-            <div className="text-lg font-bold md:py-0 py-4">
+            <div className="text-lg font-bold md:py-3 py-4">
                 <a href="/">
                     <Image
                         src="/OurMechanicLogo-crop.png"
                         alt="Our Mechanic Logo"
-                        width={175}
-                        height={40}
+                        width={250}
+                        height={100}
                         priority
                     />
                 </a>
