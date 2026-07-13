@@ -1,5 +1,5 @@
 const BRAND_RED = "#ED2424";
-const LOGO_URL = "https://ourmechanic.ca/OurMechanicLogo-1.png";
+const LOGO_URL = "https://ourmechanic.ca/OurMechanicLogo-crop.png";
 
 function emailWrapper(content: string): string {
   return `

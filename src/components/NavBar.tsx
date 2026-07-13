@@ -11,7 +11,7 @@ export default function NavBar() {
             <div className="text-lg font-bold md:py-0 py-4">
                 <a href="/">
                     <Image
-                        src="/OurMechanicLogo-1.png"
+                        src="/OurMechanicLogo-crop.png"
                         alt="Our Mechanic Logo"
                         width={175}
                         height={40}
